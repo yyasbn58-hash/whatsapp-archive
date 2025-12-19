@@ -12,7 +12,17 @@ const KEYWORDS = (process.env.KEYWORDS || "")
   .split(",")
   .map(k => k.trim())
   .filter(Boolean);
+function hasUrl(text = "") {
+  return /(https?:\/\/|www\.)\S+/i.test(text);
+}
 
+function hasNumber(text = "") {
+  return /\d/.test(text);
+}
+
+function wordCount(text = "") {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
 function match(text = "") {
   const t = text.toLowerCase();
   return KEYWORDS.find(k => t.includes(k.toLowerCase()));
@@ -45,6 +55,14 @@ async function start() {
 
       const keyword = match(text);
       if (!keyword) continue;
+      // إذا الرسالة أكثر من 10 كلمات تجاهلها
+if (wordCount(text) > 10) continue;
+
+// إذا فيها رابط تجاهلها
+if (hasUrl(text)) continue;
+
+// إذا فيها رقم تجاهلها
+if (hasNumber(text)) continue;
 
       const link = `https://wa.me/${jid.replace("@g.us","")}`;
 
